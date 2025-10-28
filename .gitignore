@@ -1,0 +1,21 @@
+# MATLAB / Octave
+*.asv
+*.mex*
+*.mltbx
+*.mat
+*.m~*
+*.slxc
+*.slprj/
+*.autosave
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Python venvs if you add wrappers later
+.venv/
+__pycache__/
+*.pyc
