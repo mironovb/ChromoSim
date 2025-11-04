@@ -1,6 +1,6 @@
 # ChromoSim
 
-1D ion-exchange chromatography column simulator (mechanistic model; multi-species; with gradient; FPLC-style outputs)
+Open-Source chromatography modeling software - 1D ion-exchange chromatography column simulator (mechanistic model; multi-species; with gradient; FPLC-style outputs)
 
 **ChromoSim** simulates axial convection–dispersion with competitive Langmuir binding. Affinity can be constant (e.g., proteins) or mapped to a per-species property (e.g., surface potential) with salt-dependent screening. Outputs: breakthrough curves, in-column heatmaps, and an FPLC-style trace (mL / pseudo-mAU) with a %B overlay.
 
