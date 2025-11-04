@@ -51,16 +51,30 @@ Edit parameters in **`scripts/main_ev_aex.py`** (or create your own script):
 
 ## What the model solves
 
-**Mobile phase for species i:**
-$$\partial_t C_i = -u \partial_z C_i + D_{\mathrm{ax}} \partial_{zz} C_i - \frac{1-\varepsilon}{\varepsilon} \partial_t Q_i$$
+# Chromatography Column Model
 
-**Wall phase (competitive Langmuir):**
-$$\partial_t Q_i = k_{a,i} C_i\Big(Q_{\max}-\sum_j Q_j\Big) - k_{d,i}Q_i$$
+## Core Equations
 
-**Optional affinity map:**
-$$K_i \equiv \frac{k_{a,i}}{k_{d,i}} = K^\circ \exp\big(\gamma\,|P_i|\,f(I)\big)$$
+### Mobile Phase Mass Balance
+**For species i:**
+$$\partial_t C_i = -u\,\partial_z C_i + D_{\mathrm{ax}}\,\partial_{zz} C_i - \frac{1-\varepsilon}{\varepsilon}\,\partial_t Q_i$$
 
-(Use constant $K_i$ by setting $\gamma=0$.)
+### Stationary Phase Kinetics (Competitive Langmuir)
+**For species i:**
+$$\partial_t Q_i = k_{a,i}\,C_i\left(Q_{\max}-\sum_j Q_j\right) - k_{d,i}\,Q_i$$
+
+### Optional Salt-Dependent Affinity
+**For species i:**
+$$K_i = K^\circ \exp\left(-\frac{\gamma\,|P_i|}{I_\*}(I - I_{\mathrm{ref}})\right)$$
+
+Use constant $K_i$ by setting $\gamma=0$.
+
+## Key Parameters
+- **Mobile phase**: $C_i$ (concentration), $u$ (velocity), $D_{\mathrm{ax}}$ (dispersion), $\varepsilon$ (porosity)
+- **Stationary phase**: $Q_i$ (loading), $Q_{\max}$ (capacity), $k_{a,i}$, $k_{d,i}$ (rate constants)
+- **Salt effects**: $I$ (ionic strength), $I_{\mathrm{ref}}$ (reference), $\gamma$ (modulation)
+
+[See full documentation for detailed parameter explanations and theory.]
 
 ## Repo layout
 
