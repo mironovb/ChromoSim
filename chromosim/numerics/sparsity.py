@@ -1,25 +1,28 @@
 from __future__ import annotations
 import numpy as np
-from scipy.sparse import diags, eye, bmat, csc_matrix
+from scipy.sparse import spdiags, kron, eye, bmat, csr_matrix
 
-def jacobian_sparsity_multi(N: int, Ns: int) -> csc_matrix:
+def sparsity_pattern_multi(N: int, Ns: int):
     """
-    2*N*Ns x 2*N*Ns logical Jacobian sparsity for multi-species column model.
-
-    State layout (row-major):
-      y = [ c(0,0..Ns-1), ..., c(N-1,0..Ns-1),
-            qhat(0,0..Ns-1), ..., qhat(N-1,0..Ns-1) ]
+    Boolean sparse pattern for the Jacobian of size 2*N*Ns × 2*N*Ns.
+    State ordering:
+        [ c(1..N, species 1..Ns) ; qhat(1..N, species 1..Ns) ]
+    Blocks:
+        dc/dc  ~ tri-diagonal in z for each species
+        dc/dq  ~ diagonal (local kinetics)
+        dq/dc  ~ diagonal (local kinetics)
+        dq/dq  ~ diagonal
     """
     e = np.ones(N)
-    T = diags([e, e, e], offsets=[-1, 0, 1], shape=(N, N), format="csc")
+    T = spdiags([e, e, e], [-1, 0, 1], N, N, format='csr')  # tri-diagonal
+    # replicate per species
+    Ac = kron(eye(Ns, format='csr'), (T != 0), format='csr')  # Nc×Nc, Nc=N*Ns
 
-    # replicate tri-diagonal axial stencil per species
-    Ac = bmat([[T if s == r else None for s in range(Ns)]
-               for r in range(Ns)], format="csc")
     Nc = N * Ns
-    I  = eye(Nc, format="csc")
+    B  = eye(Nc, format='csr', dtype=bool)    # diagonal
+    Iq = eye(Nc, format='csr', dtype=bool)
 
-    S = bmat([[Ac, I],
-              [I,  I]], format="csc")
-    S.data[:] = 1
+    # assemble block matrix
+    S = bmat([[Ac.astype(bool), B],
+              [B,               Iq]], format='csr')
     return S
