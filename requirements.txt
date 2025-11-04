@@ -1,2 +1,5 @@
+-e .
 numpy
 scipy
+matplotlib
+pydantic>=2
