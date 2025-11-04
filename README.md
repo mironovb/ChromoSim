@@ -1,6 +1,6 @@
 # ChromoSim
 
-1D ion-exchange chromatography column simulator (mechanistic; multi-species; gradient; FPLC-style outputs)
+1D ion-exchange chromatography column simulator (mechanistic model; multi-species; with gradient; FPLC-style outputs)
 
 **ChromoSim** simulates axial convection–dispersion with competitive Langmuir binding. Affinity can be constant (e.g., proteins) or mapped to a per-species property (e.g., surface potential) with salt-dependent screening. Outputs: breakthrough curves, in-column heatmaps, and an FPLC-style trace (mL / pseudo-mAU) with a %B overlay.
 
@@ -51,25 +51,16 @@ Edit parameters in **`scripts/main_ev_aex.py`** (or create your own script):
 
 ## What the model solves
 
-**Mobile phase for species \(i\):**
-$$
-\partial_t C_i \;=\; -u\,\partial_z C_i \;+\; D_{\mathrm{ax}}\,\partial_{zz} C_i
-\;-\; \frac{1-\varepsilon}{\varepsilon}\,\partial_t Q_i .
-$$
+**Mobile phase for species i:**
+$$\partial_t C_i = -u \partial_z C_i + D_{\mathrm{ax}} \partial_{zz} C_i - \frac{1-\varepsilon}{\varepsilon} \partial_t Q_i$$
 
 **Wall phase (competitive Langmuir):**
-$$
-\partial_t Q_i \;=\; k_{a,i}\,C_i\Big(Q_{\max}-\sum_j Q_j\Big) \;-\; k_{d,i}\,Q_i .
-$$
+$$\partial_t Q_i = k_{a,i} C_i\Big(Q_{\max}-\sum_j Q_j\Big) - k_{d,i}Q_i$$
 
 **Optional affinity map:**
-$$
-K_i \;\equiv\; \frac{k_{a,i}}{k_{d,i}}
-\;=\; K^\circ \exp\!\big(\gamma\,|P_i|\,f(I)\big).
-$$
+$$K_i \equiv \frac{k_{a,i}}{k_{d,i}} = K^\circ \exp\big(\gamma\,|P_i|\,f(I)\big)$$
 
-Use constant \(K_i\) by setting \(\gamma=0\).
-
+(Use constant $K_i$ by setting $\gamma=0$.)
 
 ## Repo layout
 
