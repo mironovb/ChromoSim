@@ -1,28 +1,90 @@
 # ChromoSim
+
 1D ion-exchange chromatography column simulator (mechanistic; multi-species; gradient; FPLC-style outputs)
 
-**ChromoSim** is a general, mechanistic simulator for ion-exchange chromatography
-(anionic or cationic). It models 1D convection–dispersion with competitive binding
-and supports user-defined affinity maps (e.g., surface-potential dependent) or 
-constant-affinity protein models.
+**ChromoSim** simulates axial convection–dispersion with competitive Langmuir binding. Affinity can be constant (e.g., proteins) or mapped to a per-species property (e.g., surface potential) with salt-dependent screening. Outputs: breakthrough curves, in-column heatmaps, and an FPLC-style trace (mL / pseudo-mAU) with a %B overlay.
 
 ## Highlights
-- Multi-species breakthrough & in-column heatmaps
-- FPLC-style output (mL / pseudo-mAU) with %B overlay
-- Fast stiff-ODE integration with sparse Jacobian
-- Works for proteins, nanoparticles, EVs (by configuration)
+
+* Multi-species breakthrough + in-column heatmaps
+* FPLC-style plot (elution volume in mL, pseudo-mAU) with %B overlay
+* Fast stiff-ODE solve with a sparse Jacobian
+* Configurable for proteins, nanoparticles, or EVs
+
+## Install
+
+```bash
+# from the repo root
+python -m venv .venv
+source .venv/bin/activate            # Windows: .venv\Scripts\activate
+pip install -U pip setuptools wheel
+pip install -r requirements.txt      # installs ChromoSim in editable mode
+```
+
+## Run a demo
+
+```bash
+# CLI entry point (if available)
+chromosim-run
+
+# or run the example script directly
+python -m scripts.main_ev_aex
+```
+
+This builds derivative matrices, integrates the model, and opens:
+
+* Breakthrough/elution with %B overlay
+* In-column concentration heatmap
+* FPLC-style trace (mL / pseudo-mAU) with %B overlay
+
+## Configure a run
+
+Edit parameters in **`scripts/main_ev_aex.py`** (or create your own script):
+
+* **Column & grid:** `L`, `N` (with `dz = L/N`), `eps`
+* **Hydrodynamics:** `u` (via flow), `Dax`
+* **Species:** `Nsp`, `frac`, optional per-species property array
+* **Capacity:** `qmax`
+* **Kinetics:** `kd0`, `K0`, `gamma`, and `fI(I)` (or set `gamma=0` for constant affinity)
+* **Programs:** `grad_start`, `grad_end`, `I_load`, `I_elute` and `salt_profile(t)`
+* **Feed:** `Cfeed_total`, `frac`, `feed_profile(t)` (e.g., 5 min load at 1 mL/min)
+
+## What the model solves (brief)
+
+Mobile phase for species *i*:
+[
+\partial_t C_i = -u,\partial_z C_i + D_{\mathrm{ax}},\partial_{zz} C_i - \frac{1-\varepsilon}{\varepsilon},\partial_t Q_i
+]
+Wall phase (competitive Langmuir):
+[
+\partial_t Q_i = k_{a,i} C_i\Big(Q_{\max}-\sum_j Q_j\Big) - k_{d,i}Q_i
+]
+Optional affinity map:
+[
+K_i \equiv \frac{k_{a,i}}{k_{d,i}} = K^\circ \exp!\big(\gamma,|P_i|,f(I)\big)
+]
+*(Use constant (K_i) by setting (\gamma=0).)*
 
 ## Repo layout
-- `src/` library code (added later)
-- `examples/` runnable demos (added later)
-- `assets/` figures/schematics (MIT-licensed)
-- `data/` small demo data (LFS)
-- `docs/` user docs & images
-- `tests/` lightweight checks
 
-## Quick start
-Examples and core library will be added in v0.1.0.  
-For now, see `docs/` for the modeling overview.
+* `chromosim/` core library
 
-## License
-MIT for code and assets.
+  * `numerics/` derivative matrices, sparsity, ODE system
+  * `models/` parameter helpers (profiles, defaults)
+* `scripts/` runnable examples
+* `docs/` user docs & public figures (MIT)
+* `requirements.txt`, `pyproject.toml` packaging
+
+## Tips
+
+* Coarser grids (`N`) run faster; refine only to resolve peak shape.
+* If plots don’t show on macOS, try: `export MPLBACKEND=TkAgg` before running.
+* To compare with instrument data, adjust `eps_det` in the example to match the mAU scale visually.
+
+## Contributing
+
+Issues and PRs welcome. See `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
+
+## License & citation
+
+MIT for code and assets. If you use ChromoSim in a publication, please cite the repo (`CITATION.cff`).
