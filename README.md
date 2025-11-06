@@ -24,10 +24,6 @@ pip install -r requirements.txt      # installs ChromoSim in editable mode
 ## Run a demo
 
 ```bash
-# CLI entry point (if available)
-chromosim-run
-
-# or run the example script directly
 python -m scripts.main_ev_aex
 ```
 
